@@ -44,7 +44,7 @@
               filled
               class="q-mb-xm"
             />
-            <q-btn color="primary" @click="addData" dense>Add</q-btn>
+            <q-btn class="full-width" color="primary" @click="addData" dense>Add</q-btn>
           </div>
           <div class="table-container">
             <div class="table-responsive">

@@ -1,43 +1,56 @@
 
 <template>
- <header>
-  <nav class="navbar">
-    <router-link @click="checkToken" class="allRoutes" to="/">
-      Home
-    </router-link>
-    <router-link class="allRoutes" to="/login">
-      Login
-    </router-link>
-    <router-link class="allRoutes" to="/signup">
-      sign Up
-    </router-link>
-  </nav>
-  <router-view />
- </header>
+  <header>
+    <nav class="navbar">
+      <router-link @click="checkToken" class="allRoutes" to="/">
+        Home
+      </router-link>
+      <q-dialog v-model="dialogShow">
+        <q-card>
+          <q-card-section>
+            <div class="text-h6"></div>
+            <div>{{ message }}</div>
+          </q-card-section>
+
+          <q-card-actions>
+            <q-btn class="full-width" label="OK" @click="dialogShow = false" color="primary" />
+          </q-card-actions>
+        </q-card>
+      </q-dialog>
+      <router-link class="allRoutes" to="/login"> Login </router-link>
+      <router-link class="allRoutes" to="/signup"> sign Up </router-link>
+    </nav>
+    <router-view />
+  </header>
 </template>
 
 
 
 <script setup>
+import { ref} from 'vue';
 import { useRouter } from "vue-router";
-import * as jose from 'jose'
+import * as jose from "jose";
+
+const dialogShow = ref(false);
+const message = ref("");
 
 const router = useRouter();
 
 function checkToken() {
   const token = localStorage.getItem("token");
   const decodedToken = jose.decodeJwt(token);
-  console.log(decodedToken)
+  console.log(decodedToken);
   if (decodedToken.exp * 1000 < new Date().getTime()) {
     console.log("Token has expired");
     router.push("/login");
+    dialogShow.value = true;
+    message.value = "Please Login First";
   } else {
     console.log("Token is still valid");
     router.push("/");
   }
-  console.log(token)
+  console.log(token);
 }
-
 </script>
 
 <style scoped>
@@ -62,6 +75,21 @@ function checkToken() {
 
 .allRoutes:hover {
   background-color: rgb(53, 52, 52);
-  color: white; 
+  color: white;
 }
+
+.text-h6 {
+  color: rgb(65, 65, 65);
+  font-size: 0.7rem;
+  line-height: 0.7rem;
+  text-align: center;
+}
+.q-card {
+  min-width: 350px; /* Adjust the width to your preference */
+  max-width: 100%;
+  max-height: 300px; /* Adjust the height to your preference */
+  min-height: fit-content;
+  text-align: center;
+}
+
 </style>
