@@ -42,9 +42,9 @@
               dense
               outlined
               filled
-              class="q-mb-md"
+              class="q-mb-xm"
             />
-            <q-btn color="primary" @click="addData" class="q-mt-md">Add</q-btn>
+            <q-btn color="primary" @click="addData" dense>Add</q-btn>
           </div>
           <div class="table-container">
             <div class="table-responsive">
@@ -81,6 +81,11 @@
 
 <script setup>
 import { ref } from "vue";
+import * as jose from 'jose';
+import { useRouter } from "vue-router";
+
+
+const router = useRouter();
 
 const formData = ref({
   name: "",
@@ -88,6 +93,24 @@ const formData = ref({
   endDate: "",
   description: "",
 });
+
+
+window.addEventListener("load", checkToken);
+
+function checkToken() {
+  const token = localStorage.getItem("token");
+  const decodedToken = jose.decodeJwt(token);
+  console.log(decodedToken)
+  if (decodedToken.exp * 1000 < new Date().getTime()) {
+    console.log("Token has expired");
+    router.push("/login");
+  } else {
+    console.log("Token is still valid");
+    router.push("/");
+  }
+  console.log(token)
+}
+
 
 const users = ref([]);
 
@@ -176,7 +199,7 @@ function clearInputs() {
 
 .q-btn {
   margin: 10px;
-  padding: 8px 16px;
+  padding: 3px 15px;
 }
 
 .q-table {

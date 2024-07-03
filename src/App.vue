@@ -2,7 +2,7 @@
 <template>
  <header>
   <nav class="navbar">
-    <router-link class="allRoutes" to="/">
+    <router-link @click="checkToken" class="allRoutes" to="/">
       Home
     </router-link>
     <router-link class="allRoutes" to="/login">
@@ -19,6 +19,24 @@
 
 
 <script setup>
+import { useRouter } from "vue-router";
+import * as jose from 'jose'
+
+const router = useRouter();
+
+function checkToken() {
+  const token = localStorage.getItem("token");
+  const decodedToken = jose.decodeJwt(token);
+  console.log(decodedToken)
+  if (decodedToken.exp * 1000 < new Date().getTime()) {
+    console.log("Token has expired");
+    router.push("/login");
+  } else {
+    console.log("Token is still valid");
+    router.push("/");
+  }
+  console.log(token)
+}
 
 </script>
 
