@@ -13,12 +13,16 @@
           </q-card-section>
 
           <q-card-actions>
-            <q-btn class="full-width" label="OK" @click="dialogShow = false" color="primary" />
+            <q-btn
+              class="full-width"
+              label="OK"
+              @click="dialogShow = false"
+              color="primary"
+            />
           </q-card-actions>
         </q-card>
       </q-dialog>
       <router-link class="allRoutes" to="/login"> Login </router-link>
-      <router-link class="allRoutes" to="/signup"> sign Up </router-link>
     </nav>
     <router-view />
   </header>
@@ -27,7 +31,7 @@
 
 
 <script setup>
-import { ref} from 'vue';
+import { ref } from "vue";
 import { useRouter } from "vue-router";
 import * as jose from "jose";
 
@@ -36,19 +40,39 @@ const message = ref("");
 
 const router = useRouter();
 
+window.addEventListener("load", checkToken);
 function checkToken() {
   const token = localStorage.getItem("token");
-  const decodedToken = jose.decodeJwt(token);
-  console.log(decodedToken);
-  if (decodedToken.exp * 1000 < new Date().getTime()) {
-    console.log("Token has expired");
-    router.push("/login");
+
+  if (!token) {
+    console.log("No token found");
     dialogShow.value = true;
     message.value = "Please Login First";
-  } else {
-    console.log("Token is still valid");
-    router.push("/");
+    router.push("/login");
+    return;
   }
+
+  try {
+    const decodedToken = jose.decodeJwt(token);
+    console.log(decodedToken);
+
+    if (decodedToken.exp * 1000 < new Date().getTime()) {
+      console.log("Token has expired");
+      dialogShow.value = true;
+      message.value = "Please Login First";
+      router.push("/login");
+    } else {
+      console.log("Token is still valid");
+      router.push("/");
+    }
+  }
+   catch (error) {
+    console.log("Error decoding token: ", error.message);
+    dialogShow.value = true;
+    message.value = "Please Login Again";
+    router.push("/login");
+  }
+
   console.log(token);
 }
 </script>
@@ -91,5 +115,4 @@ function checkToken() {
   min-height: fit-content;
   text-align: center;
 }
-
 </style>

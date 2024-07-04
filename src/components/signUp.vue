@@ -81,6 +81,18 @@
                 label="submit"
               ></q-btn>
             </q-card-section>
+            <q-card-section class="text-center q-pt-none">
+            <div class="text-grey-8">
+              Do you have an account?
+              <router-link
+                class="text-dark text-weight-bold"
+                style="text-decoration: none"
+                to="/login"
+                >Login</router-link
+              >
+              <router-view />
+            </div>
+          </q-card-section>
           </q-form>
         </q-card>
       </q-page>

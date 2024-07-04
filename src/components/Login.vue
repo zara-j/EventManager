@@ -80,7 +80,7 @@ window.addEventListener("load", checkToken);
 
 function checkToken() {
   const token = localStorage.getItem("token");
-  const decodedToken = jose.decodeJwt(token);
+  const decodedToken = jose.decodeJwt("token");
   console.log(decodedToken)
   if (decodedToken.exp * 1000 < new Date().getTime()) {
     console.log("Token has expired");
@@ -107,10 +107,7 @@ function loginUsers() {
     .then(function (response) {
       //console.log(response)
       if (response.status === 200) {
-        // Save token to localStorage
-        //console.log("hello token"+response.data.access)
         localStorage.setItem("token", response.data.access);
-        // Redirect to the dashboard
         router.push("/");
       }
     })
