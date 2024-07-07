@@ -2,49 +2,124 @@
   <q-layout>
     <q-page-container class="bg-grey-2">
       <q-page class="q-pa-md">
-        <div class="title-container">
-          <h1 class="text-h3 q-my-xs">Event Manager</h1>
-          <h2 class="text-h6">Add & Edit Your Events</h2>
-        </div>
+       
         <div class="content-container">
-          <div id="formContainer" class="q-mb-md text-left">
-            <q-input
-              v-model="formData.name"
-              label="Name"
-              dense
-              outlined
-              filled
-              class="q-mb-md"
-            />
-            <q-input
-              v-model="formData.startDate"
-              type="date"
-              label="Start Date"
-              dense
-              outlined
-              filled
-              class="q-mb-md"
-            />
-            <q-input
-              v-model="formData.endDate"
-              type="date"
-              label="End Date"
-              dense
-              outlined
-              filled
-              class="q-mb-md"
-            />
-            <q-input
-              v-model="formData.description"
-              type="textarea"
-              icon="edit"
-              label="Description"
-              dense
-              outlined
-              filled
-              class="q-mb-xm"
-            />
-            <q-btn class="full-width" color="primary" @click="addData" dense>Add</q-btn>
+          <div class="form-elements">
+            <div id="formContainer" class="text-left">
+              <div class="q-pa-sm" style="max-width: 300px">
+                <q-input v-model="formData.name" label="Name" outlined filled />
+              </div>
+              <div class="q-pa-sm" style="max-width: 300px">
+                <q-input label="Start time" filled v-model="formData.startDate">
+                  <template v-slot:prepend>
+                    <q-icon name="event" class="cursor-pointer">
+                      <q-popup-proxy
+                        cover
+                        transition-show="scale"
+                        transition-hide="scale"
+                      >
+                        <q-date v-model="formData.startDate" mask="YYYY-MM-DD HH:mm">
+                          <div class="row items-center justify-end">
+                            <q-btn
+                              v-close-popup
+                              label="Close"
+                              color="primary"
+                              flat
+                            />
+                          </div>
+                        </q-date>
+                      </q-popup-proxy>
+                    </q-icon>
+                  </template>
+
+                  <template v-slot:append>
+                    <q-icon name="access_time" class="cursor-pointer">
+                      <q-popup-proxy
+                        cover
+                        transition-show="scale"
+                        transition-hide="scale"
+                      >
+                        <q-time v-model="formData.startDate" mask="YYYY-MM-DD HH:mm" format24h>
+                          <div class="row items-center justify-end">
+                            <q-btn
+                              v-close-popup
+                              label="Close"
+                              color="primary"
+                              flat
+                            />
+                          </div>
+                        </q-time>
+                      </q-popup-proxy>
+                    </q-icon>
+                  </template>
+                </q-input>
+              </div>
+              <div class="q-pa-sm" style="max-width: 300px">
+                <q-input label="End time" filled v-model="formData.endDate">
+                  <template v-slot:prepend>
+                    <q-icon name="event" class="cursor-pointer">
+                      <q-popup-proxy
+                        cover
+                        transition-show="scale"
+                        transition-hide="scale"
+                      >
+                        <q-date v-model="formData.endDate" mask="YYYY-MM-DD HH:mm">
+                          <div class="row items-center justify-end">
+                            <q-btn
+                              v-close-popup
+                              label="Close"
+                              color="primary"
+                              flat
+                            />
+                          </div>
+                        </q-date>
+                      </q-popup-proxy>
+                    </q-icon>
+                  </template>
+
+                  <template v-slot:append>
+                    <q-icon name="access_time" class="cursor-pointer">
+                      <q-popup-proxy
+                        cover
+                        transition-show="scale"
+                        transition-hide="scale"
+                      >
+                        <q-time v-model="formData.endDate" mask="YYYY-MM-DD HH:mm" format24h>
+                          <div class="row items-center justify-end">
+                            <q-btn
+                              v-close-popup
+                              label="Close"
+                              color="primary"
+                              flat
+                            />
+                          </div>
+                        </q-time>
+                      </q-popup-proxy>
+                    </q-icon>
+                  </template>
+                </q-input>
+              </div>
+              <div class="q-pa-sm" style="max-width: 300px">
+                <q-input
+                  v-model="formData.description"
+                  type="textarea"
+                  icon="edit"
+                  label="Description"
+                  dense
+                  outlined
+                  filled
+                />
+              </div>
+              <q-btn   
+                dense
+                outlined
+                filled
+                class=" full-width"
+                style="background-color: #343634; color: #fff"
+                @click="addEvent"
+                >Add</q-btn
+              >
+            </div>
           </div>
           <div class="table-container">
             <div class="table-responsive">
@@ -81,26 +156,25 @@
 
 <script setup>
 import { ref } from "vue";
-import * as jose from 'jose';
+import axios from "axios";
+import * as jose from "jose";
 import { useRouter } from "vue-router";
-
 
 const router = useRouter();
 
 const formData = ref({
   name: "",
-  startDate: "",
+  startDate: null,
   endDate: "",
   description: "",
 });
-
 
 window.addEventListener("load", checkToken);
 
 function checkToken() {
   const token = localStorage.getItem("token");
   const decodedToken = jose.decodeJwt(token);
-  console.log(decodedToken)
+  console.log(decodedToken);
   if (decodedToken.exp * 1000 < new Date().getTime()) {
     console.log("Token has expired");
     router.push("/login");
@@ -108,19 +182,42 @@ function checkToken() {
     console.log("Token is still valid");
     router.push("/");
   }
-  console.log(token)
+  console.log(token);
 }
-
 
 const users = ref([]);
 
-function addData() {
-  if (formData.value.name && formData.value.startDate) {
-    users.value.push({ ...formData.value });
-    clearInputs();
-  } else {
-    alert("Please fill in all fields.");
-  }
+function addEvent() {
+  const token = localStorage.getItem("token");
+
+  // Convert startDate and endDate to Unix timestamps
+  const startTimestamp = Math.floor(new Date(formData.value.startDate).getTime() / 1000);
+  const endTimestamp = Math.floor(new Date(formData.value.endDate).getTime() / 1000);
+
+  const data = {
+    EventSummery: formData.value.name,
+    StartTime: startTimestamp,
+    EndTime: endTimestamp,
+    Description: formData.value.description,
+  };
+
+  axios
+    .post("https://event.shirpala.ir/api/event/create/", data, {
+      headers: {
+        "Content-Type": "application/json", // Use application/json for JSON data
+        Authorization: "Bearer " + token,
+      },
+    })
+    .then(function (response) {
+      if (response.status === 200) {
+        console.log(response);
+        alert(response.data.message);
+      }
+    })
+    .catch(function (error) {
+      console.log(error.response.data);
+      alert(error.response.data.message); // Access the error message from response.data
+    });
 }
 
 function editData(index) {
@@ -185,21 +282,28 @@ function clearInputs() {
   margin-right: 20px;
 }
 
+.form-elements {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center items horizontally */
+}
+
+.q-input {
+  width: 100%;
+  
+}
+
+/* .q-btn {
+  margin: 10px;
+  padding: 5px 50px;
+} */
+
 .table-container {
   flex-grow: 1;
 }
 
 .table-responsive {
   overflow-x: auto;
-}
-
-.q-input {
-  width: 100%;
-}
-
-.q-btn {
-  margin: 10px;
-  padding: 3px 15px;
 }
 
 .q-table {
@@ -226,11 +330,11 @@ th {
   .content-container {
     flex-direction: column;
   }
-  
+
   #formContainer {
     margin: 0 auto 20px;
   }
-  
+
   .table-container {
     overflow-x: auto;
   }
