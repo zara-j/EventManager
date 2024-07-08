@@ -2,7 +2,6 @@
   <q-layout>
     <q-page-container class="bg-grey-2">
       <q-page class="q-pa-md">
-       
         <div class="content-container">
           <div class="form-elements">
             <div id="formContainer" class="text-left">
@@ -18,7 +17,10 @@
                         transition-show="scale"
                         transition-hide="scale"
                       >
-                        <q-date v-model="formData.startDate" mask="YYYY-MM-DD HH:mm">
+                        <q-date
+                          v-model="formData.startDate"
+                          mask="YYYY-MM-DD HH:mm"
+                        >
                           <div class="row items-center justify-end">
                             <q-btn
                               v-close-popup
@@ -39,7 +41,11 @@
                         transition-show="scale"
                         transition-hide="scale"
                       >
-                        <q-time v-model="formData.startDate" mask="YYYY-MM-DD HH:mm" format24h>
+                        <q-time
+                          v-model="formData.startDate"
+                          mask="YYYY-MM-DD HH:mm"
+                          format24h
+                        >
                           <div class="row items-center justify-end">
                             <q-btn
                               v-close-popup
@@ -63,7 +69,10 @@
                         transition-show="scale"
                         transition-hide="scale"
                       >
-                        <q-date v-model="formData.endDate" mask="YYYY-MM-DD HH:mm">
+                        <q-date
+                          v-model="formData.endDate"
+                          mask="YYYY-MM-DD HH:mm"
+                        >
                           <div class="row items-center justify-end">
                             <q-btn
                               v-close-popup
@@ -84,7 +93,11 @@
                         transition-show="scale"
                         transition-hide="scale"
                       >
-                        <q-time v-model="formData.endDate" mask="YYYY-MM-DD HH:mm" format24h>
+                        <q-time
+                          v-model="formData.endDate"
+                          mask="YYYY-MM-DD HH:mm"
+                          format24h
+                        >
                           <div class="row items-center justify-end">
                             <q-btn
                               v-close-popup
@@ -110,11 +123,11 @@
                   filled
                 />
               </div>
-              <q-btn   
+              <q-btn
                 dense
                 outlined
                 filled
-                class=" full-width"
+                class="full-width"
                 style="background-color: #343634; color: #fff"
                 @click="addEvent"
                 >Add</q-btn
@@ -189,22 +202,38 @@ const users = ref([]);
 
 function addEvent() {
   const token = localStorage.getItem("token");
+  const startTimestampnumber = Math.floor(
+    new Date(formData.value.startDate).getTime() / 1000
+  );
+  const endTimestampnumber = Math.floor(
+    new Date(formData.value.endDate).getTime() / 1000
+  );
 
-  // Convert startDate and endDate to Unix timestamps
-  const startTimestamp = Math.floor(new Date(formData.value.startDate).getTime() / 1000);
-  const endTimestamp = Math.floor(new Date(formData.value.endDate).getTime() / 1000);
+  // Validate start timestamp
+  if (!startTimestampnumber) {
+    // Display an error message or handle the validation error
+    alert("Please fill in the start date.");
+    return;
+  }
+  if (!formData.value.name) {
+    // Display an error message or handle the validation error
+    alert("Please fill in the title.");
+    return;
+  }
 
+  const startTimestamp = startTimestampnumber.toString();
+  const endTimestamp = endTimestampnumber ? endTimestampnumber.toString() : ""; // If endTimestampnumber is not null, convert it to string; otherwise, set an empty string
   const data = {
     EventSummery: formData.value.name,
     StartTime: startTimestamp,
     EndTime: endTimestamp,
-    Description: formData.value.description,
+    Description: formData.value.description || "", // If description is not provided, set an empty string
   };
 
   axios
     .post("https://event.shirpala.ir/api/event/create/", data, {
       headers: {
-        "Content-Type": "application/json", // Use application/json for JSON data
+        "Content-Type": "application/json",
         Authorization: "Bearer " + token,
       },
     })
@@ -216,7 +245,7 @@ function addEvent() {
     })
     .catch(function (error) {
       console.log(error.response.data);
-      alert(error.response.data.message); // Access the error message from response.data
+      alert(error.response.data.message);
     });
 }
 
@@ -256,6 +285,7 @@ function clearInputs() {
   formData.value.endDate = "";
   formData.value.description = "";
 }
+
 </script>
 
 <style scoped>
@@ -285,12 +315,11 @@ function clearInputs() {
 .form-elements {
   display: flex;
   flex-direction: column;
-  align-items: center; /* Center items horizontally */
+  align-items: center;
 }
 
 .q-input {
   width: 100%;
-  
 }
 
 /* .q-btn {
