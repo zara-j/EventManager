@@ -289,6 +289,61 @@ function addEvent() {
     });
 }
 
+function editData(index) {
+  if (index >= 0 && index < users.value.length) {
+    const user = users.value[index];
+
+    const name = prompt("Enter the updated name:", user.name);
+    const startDate = prompt("Enter the updated start date:", user.startDate);
+    const endDate = prompt("Enter the updated end date:", user.endDate);
+    const description = prompt("Enter the updated description:", user.description);
+
+    if (name && startDate) {
+      const token = localStorage.getItem("token");
+
+      // Convert the date inputs to Unix timestamps
+      const startTimestamp = Math.floor(new Date(startDate).getTime() / 1000).toString();
+      const endTimestamp = endDate ? Math.floor(new Date(endDate).getTime() / 1000).toString() : "";
+
+      const data = {
+        TempEventSummery: name,
+        TempStartTime: startTimestamp,
+        TempEndTime: endTimestamp,
+        TempDescription: description || "",
+        taskId: user.id // assuming 'id' is available in the user object
+      };
+
+      axios.post("https://event.shirpala.ir/api/event/edit/", data, {
+        headers: {
+          "Authorization": "Bearer " + token,
+          "Content-Type": "application/json"
+        }
+      })
+      .then((response) => {
+        console.log(response.data);
+        // Update local state only if server update is successful
+        users.value[index] = { ...users.value[index], name, startDate, endDate, description };
+        alert("Event updated successfully.");
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error.response) {
+          console.log(error.response.data);
+        } else {
+          console.log("Error: ", error.message);
+        }
+        alert("Failed to update the event.");
+      });
+    } else {
+      alert("Please fill in all fields.");
+    }
+  } else {
+    alert("User not found.");
+  }
+}
+
+
+
 function deleteData(index) {
   if (index >= 0 && index < users.value.length) {
     users.value.splice(index, 1);
