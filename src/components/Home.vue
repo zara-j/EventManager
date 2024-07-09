@@ -124,6 +124,7 @@
                 />
               </div>
               <q-btn
+                id="addButton"
                 dense
                 outlined
                 filled
@@ -159,6 +160,7 @@
                   </tr>
                 </tbody>
               </table>
+              <q-spinner v-if="loading" size="30px" color="primary" />
             </div>
           </div>
         </div>
@@ -167,13 +169,15 @@
   </q-layout>
 </template>
 
+
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import axios from "axios";
 import * as jose from "jose";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
+const loading = ref(true); // Initially loading
 
 const formData = ref({
   name: "",
@@ -181,6 +185,8 @@ const formData = ref({
   endDate: "",
   description: "",
 });
+
+const users = ref([]);
 
 window.addEventListener("load", checkToken);
 
@@ -198,7 +204,38 @@ function checkToken() {
   console.log(token);
 }
 
-const users = ref([]);
+function fetchEvents() {
+  loading.value = true;
+  const token = localStorage.getItem("token");
+
+  axios
+    .get("https://event.shirpala.ir/api/event/", {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + token,
+      },
+    })
+    .then((response) => {
+      users.value = response.data.map((event) => {
+        return {
+          id: event.id,
+          name: event.summery_event,
+          startDate: new Date(event.start_time).toLocaleString(),
+          endDate: event.end_time
+            ? new Date(event.end_time).toLocaleString()
+            : "",
+          description: event.description || "",
+        };
+      });
+
+      loading.value = false;
+    })
+    .catch((error) => {
+      console.log(error);
+      alert("Failed to fetch events.");
+      loading.value = false;
+    });
+}
 
 function addEvent() {
   const token = localStorage.getItem("token");
@@ -211,25 +248,24 @@ function addEvent() {
 
   // Validate start timestamp
   if (!startTimestampnumber) {
-    // Display an error message or handle the validation error
     alert("Please fill in the start date.");
     return;
   }
   if (!formData.value.name) {
-    // Display an error message or handle the validation error
     alert("Please fill in the title.");
     return;
   }
 
   const startTimestamp = startTimestampnumber.toString();
-  const endTimestamp = endTimestampnumber ? endTimestampnumber.toString() : ""; // If endTimestampnumber is not null, convert it to string; otherwise, set an empty string
+  const endTimestamp = endTimestampnumber ? endTimestampnumber.toString() : "";
   const data = {
     EventSummery: formData.value.name,
     StartTime: startTimestamp,
     EndTime: endTimestamp,
-    Description: formData.value.description || "", // If description is not provided, set an empty string
+    Description: formData.value.description || "",
   };
 
+  loading.value = true;
   axios
     .post("https://event.shirpala.ir/api/event/create/", data, {
       headers: {
@@ -241,34 +277,16 @@ function addEvent() {
       if (response.status === 200) {
         console.log(response);
         alert(response.data.message);
+        fetchEvents(); // Refresh events after adding
       }
     })
     .catch(function (error) {
       console.log(error.response.data);
       alert(error.response.data.message);
+    })
+    .finally(() => {
+      loading.value = false;
     });
-}
-
-function editData(index) {
-  if (index >= 0 && index < users.value.length) {
-    const user = users.value[index];
-
-    const name = prompt("Enter the updated name:", user.name);
-    const startDate = prompt("Enter the updated start date:", user.startDate);
-    const endDate = prompt("Enter the updated end date:", user.endDate);
-    const description = prompt(
-      "Enter the updated description:",
-      user.description
-    );
-
-    if (name && startDate) {
-      users.value[index] = { name, startDate, endDate, description };
-    } else {
-      alert("Please fill in all fields.");
-    }
-  } else {
-    alert("User not found.");
-  }
 }
 
 function deleteData(index) {
@@ -286,6 +304,9 @@ function clearInputs() {
   formData.value.description = "";
 }
 
+onMounted(() => {
+  fetchEvents(); // Fetch events when the component is mounted
+});
 </script>
 
 <style scoped>
