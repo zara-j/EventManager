@@ -141,7 +141,7 @@
                 <thead>
                   <tr>
                     <th>Id</th>
-                    <th>Name</th>
+                    <th>Title</th>
                     <th>Start Date</th>
                     <th>End Date</th>
                     <th>Description</th>
@@ -363,12 +363,12 @@ function fetchEvents() {
       users.value = response.data.map((event) => {
         return {
           id: event.id,
-          name: event.summery_event,
+          name: event.title_event,
           startDate: new Date(event.start_time).toLocaleString(),
           endDate: event.end_time
             ? new Date(event.end_time).toLocaleString()
             : "",
-          description: event.description || "",
+          description: event.summery_event || "",
         };
       });
       console.log(response.data);
@@ -403,18 +403,22 @@ function addEvent() {
 
   const startTimestamp = startTimestampnumber.toString();
   const endTimestamp = endTimestampnumber ? endTimestampnumber.toString() : "";
+  
+  // Check if description is provided, set to empty string if not
+  const description = formData.value.description ? formData.value.description.trim() : "";
+
   const data = {
-    EventSummery: formData.value.name,
+    EventTitle: formData.value.name,
+    EventSummery: description,
     StartTime: startTimestamp,
     EndTime: endTimestamp,
-    Description: formData.value.description || "",
   };
 
   loading.value = true;
   axios
     .post("https://event.shirpala.ir/api/event/create/", data, {
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "text/plain",
         Authorization: "Bearer " + token,
       },
     })
@@ -433,6 +437,8 @@ function addEvent() {
       loading.value = false;
     });
 }
+
+
 
 function openEditModal(index) {
   if (index >= 0 && index < users.value.length) {
@@ -471,10 +477,10 @@ function saveEditData() {
     url: "https://event.shirpala.ir/api/event/edit/",
     headers: {
       Authorization: "Bearer " + token,
-      TempEventSummery: editFormData.value.name,
+      TempEventTitle: editFormData.value.name,
       TempStartTime: startTimestamp,
       TempEndTime: endTimestamp,
-      Description: editFormData.value.description || "",
+      TempEventSummery: editFormData.value.description || "",
       taskId: editFormData.value.id,
     },
   };
