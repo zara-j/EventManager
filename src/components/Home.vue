@@ -156,7 +156,7 @@
                     <td>{{ user.endDate }}</td>
                     <td>{{ user.description }}</td>
                     <td>
-                      <q-btn flat icon="edit" @click="editData(index)" />
+                      <q-btn flat icon="edit" @click="openEditModal(index)" />
                       <q-btn flat icon="delete" @click="deleteData(index)" />
                     </td>
                   </tr>
@@ -166,6 +166,140 @@
             </div>
           </div>
         </div>
+
+        <!-- Modal for Editing Data -->
+        <q-dialog v-model="isEditModalOpen">
+          <q-card>
+            <q-card-section>
+              <div class="text-h6">Edit Event</div>
+            </q-card-section>
+
+            <q-card-section>
+              <q-input
+                v-model="editFormData.name"
+                label="Name"
+                outlined
+                filled
+              />
+              <q-input
+                label="Start time"
+                filled
+                v-model="editFormData.startDate"
+              >
+                <template v-slot:prepend>
+                  <q-icon name="event" class="cursor-pointer">
+                    <q-popup-proxy
+                      cover
+                      transition-show="scale"
+                      transition-hide="scale"
+                    >
+                      <q-date
+                        v-model="editFormData.startDate"
+                        mask="YYYY-MM-DD HH:mm"
+                      >
+                        <div class="row items-center justify-end">
+                          <q-btn
+                            v-close-popup
+                            label="Close"
+                            color="primary"
+                            flat
+                          />
+                        </div>
+                      </q-date>
+                    </q-popup-proxy>
+                  </q-icon>
+                </template>
+                <template v-slot:append>
+                  <q-icon name="access_time" class="cursor-pointer">
+                    <q-popup-proxy
+                      cover
+                      transition-show="scale"
+                      transition-hide="scale"
+                    >
+                      <q-time
+                        v-model="editFormData.startDate"
+                        mask="YYYY-MM-DD HH:mm"
+                        format24h
+                      >
+                        <div class="row items-center justify-end">
+                          <q-btn
+                            v-close-popup
+                            label="Close"
+                            color="primary"
+                            flat
+                          />
+                        </div>
+                      </q-time>
+                    </q-popup-proxy>
+                  </q-icon>
+                </template>
+              </q-input>
+              <q-input label="End time" filled v-model="editFormData.endDate">
+                <template v-slot:prepend>
+                  <q-icon name="event" class="cursor-pointer">
+                    <q-popup-proxy
+                      cover
+                      transition-show="scale"
+                      transition-hide="scale"
+                    >
+                      <q-date
+                        v-model="editFormData.endDate"
+                        mask="YYYY-MM-DD HH:mm"
+                      >
+                        <div class="row items-center justify-end">
+                          <q-btn
+                            v-close-popup
+                            label="Close"
+                            color="primary"
+                            flat
+                          />
+                        </div>
+                      </q-date>
+                    </q-popup-proxy>
+                  </q-icon>
+                </template>
+                <template v-slot:append>
+                  <q-icon name="access_time" class="cursor-pointer">
+                    <q-popup-proxy
+                      cover
+                      transition-show="scale"
+                      transition-hide="scale"
+                    >
+                      <q-time
+                        v-model="editFormData.endDate"
+                        mask="YYYY-MM-DD HH:mm"
+                        format24h
+                      >
+                        <div class="row items-center justify-end">
+                          <q-btn
+                            v-close-popup
+                            label="Close"
+                            color="primary"
+                            flat
+                          />
+                        </div>
+                      </q-time>
+                    </q-popup-proxy>
+                  </q-icon>
+                </template>
+              </q-input>
+              <q-input
+                v-model="editFormData.description"
+                type="textarea"
+                icon="edit"
+                label="Description"
+                dense
+                outlined
+                filled
+              />
+            </q-card-section>
+
+            <q-card-actions align="right">
+              <q-btn flat label="Cancel" color="primary" v-close-popup />
+              <q-btn flat label="Save" color="primary" @click="saveEditData" />
+            </q-card-actions>
+          </q-card>
+        </q-dialog>
       </q-page>
     </q-page-container>
   </q-layout>
@@ -187,6 +321,15 @@ const formData = ref({
   description: "",
 });
 
+const editFormData = ref({
+  id: "",
+  name: "",
+  startDate: null,
+  endDate: "",
+  description: "",
+});
+
+const isEditModalOpen = ref(false);
 const users = ref([]);
 
 window.addEventListener("load", checkToken);
@@ -200,7 +343,7 @@ function checkToken() {
     router.push("/login");
   } else {
     console.log("Token is still valid");
-    router.push("/");
+    return true;
   }
   console.log(token);
 }
@@ -291,76 +434,69 @@ function addEvent() {
     });
 }
 
-function editData(index) {
+function openEditModal(index) {
   if (index >= 0 && index < users.value.length) {
     const user = users.value[index];
-
-    const id = prompt("Enter the updated Id:", user.id);
-    const name = prompt("Enter the updated name:", user.name);
-    const startDate = prompt("Enter the updated start date:", user.startDate);
-    const endDate = prompt("Enter the updated end date:", user.endDate);
-    const description = prompt(
-      "Enter the updated description:",
-      user.description
-    );
-
-
-    if (name && startDate) {
-      const token = localStorage.getItem("token");
-
-      // Convert the date inputs to Unix timestamps
-      const startTimestamp = Math.floor(
-        new Date(startDate).getTime() / 1000
-      ).toString();
-      const endTimestamp = endDate
-        ? Math.floor(new Date(endDate).getTime() / 1000).toString()
-        : "";
-
-      const data = {
-        taskId: user.id,
-        TempEventSummery: name,
-        TempStartTime: startTimestamp,
-        TempEndTime: endTimestamp,
-        TempDescription: description || "",
-      };
-
-      axios
-        .post("https://event.shirpala.ir/api/event/edit/", data, {
-          headers: {
-            Authorization: "Bearer " + token,
-            TempEventSummery,
-            TempStartTime,
-            "Content-Type": "application/json",
-          },
-        })
-        .then((response) => {
-          console.log(response.data);
-          // Update local state only if server update is successful
-          users.value[index] = {
-            ...users.value[index],
-            id,
-            name,
-            startDate,
-            endDate,
-            description,
-          };
-          alert("Event updated successfully.");
-        })
-        .catch((error) => {
-          console.log(error);
-          if (error.response) {
-            console.log(error.response.data);
-          } else {
-            console.log("Error: ", error.message);
-          }
-          alert("Failed to update the event.");
-        });
-    } else {
-      alert("Please fill in all fields.");
-    }
+    editFormData.value = { ...user };
+    isEditModalOpen.value = true;
   } else {
     alert("User not found.");
   }
+}
+
+function saveEditData() {
+  const token = localStorage.getItem("token");
+
+  const startTimestampnumber = Math.floor(
+    new Date(editFormData.value.startDate).getTime() / 1000
+  );
+  const endTimestampnumber = Math.floor(
+    new Date(editFormData.value.endDate).getTime() / 1000
+  );
+
+  const startTimestamp = startTimestampnumber.toString();
+  const endTimestamp = endTimestampnumber ? endTimestampnumber.toString() : "";
+
+  // const data = {
+  //   EventSummery: editFormData.value.name,
+  //   StartTime: startTimestamp,
+  //   EndTime: endTimestamp,
+  //   Description: editFormData.value.description || "",
+  //   taskId: editFormData.value.id,
+  // };
+
+  const config = {
+    method: "post",
+    maxBodyLength: Infinity,
+    url: "https://event.shirpala.ir/api/event/edit/",
+    headers: {
+      Authorization: "Bearer " + token,
+      TempEventSummery: editFormData.value.name,
+      TempStartTime: startTimestamp,
+      TempEndTime: endTimestamp,
+      Description: editFormData.value.description || "",
+      taskId: editFormData.value.id,
+    },
+  };
+
+  loading.value = true;
+  axios
+    .request(config)
+    .then((response) => {
+      if (response.status === 200) {
+        alert(response.data.message);
+        console.log("Server response:", response.data); 
+        fetchEvents(); // Refresh events after editing
+        isEditModalOpen.value = false; // Close modal
+      }
+    })
+    .catch((error) => {
+      console.log(error.response.data);
+      alert(error.response.data.message);
+    })
+    .finally(() => {
+      loading.value = false;
+    });
 }
 
 function deleteData(index) {
@@ -440,11 +576,6 @@ onMounted(() => {
 .q-input {
   width: 100%;
 }
-
-/* .q-btn {
-  margin: 10px;
-  padding: 5px 50px;
-} */
 
 .table-container {
   flex-grow: 1;

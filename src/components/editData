@@ -1,0 +1,95 @@
+function editData(index) {
+  if (index >= 0 && index < users.value.length) {
+    let Istitrue = checkToken();
+    console.log("Helloooo" + Istitrue);
+    if (checkToken()) {
+      var token = localStorage.getItem("token");
+      console.log("lllll" + token);
+    } else {
+      console.log("bbbbbb" + token);
+    }
+
+    const user = users.value[index];
+    const id = user.id;
+    // const id = prompt("Enter the updated Id:", user.id);
+    // console.log("hooooo" + id)
+    const name = prompt("Enter the updated name:", user.name);
+    const startDate = prompt("Enter the updated start date:", user.startDate);
+    const endDate = prompt("Enter the updated end date:", user.endDate);
+    const description = prompt(
+      "Enter the updated description:",
+      user.description
+    );
+
+    if (name && startDate) {
+      // Convert the date inputs to Unix timestamps
+      const startTimestamp = Math.floor(
+        new Date(startDate).getTime() / 1000
+      ).toString();
+      const endTimestamp = endDate
+        ? Math.floor(new Date(endDate).getTime() / 1000).toString()
+        : "";
+      console.log("kkkkkk" + token);
+
+      if (name && startDate && endDate && description ){
+         config = {
+        method: "post",
+        maxBodyLength: Infinity,
+        url: "https://event.shirpala.ir/api/event/edit/",
+        headers: {
+          Authorization: "Bearer " + token,
+          TempEventSummery: name,
+          TempStartTime: startTimestamp,
+          TempEndTime: endTimestamp,
+          taskId: id,
+        },
+      };
+      }else if(name && startDate ){
+        const config = {
+        method: "post",
+        maxBodyLength: Infinity,
+        url: "https://event.shirpala.ir/api/event/edit/",
+        headers: {
+          Authorization: "Bearer " + token,
+          TempEventSummery: name,
+          TempStartTime: startTimestamp,
+          taskId: id,
+        },
+      };
+      }
+
+      axios
+        .request(config)
+        .then((response) => {
+          console.log("Server response:", response.data); // Debugging log
+          // Update local state only if server update is successful
+          if (response.data) {
+            users.value[index] = {
+              ...users.value[index],
+              id,
+              name,
+              startDate,
+              endDate,
+              description,
+            };
+            alert("Event updated successfully.");
+          } else {
+            alert("Failed to update the event: " + response.data.message);
+          }
+        })
+        .catch((error) => {
+          console.log("Error from server:", error); // Debugging log
+          if (error.response) {
+            console.log("Error response data:", error.response.data);
+          } else {
+            console.log("Error message: ", error.message);
+          }
+          alert("Failed to update the event.");
+        });
+    } else {
+      alert("Please fill in all fields.");
+    }
+  } else {
+    alert("User not found.");
+  }
+}
