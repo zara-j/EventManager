@@ -22,7 +22,8 @@
           </q-card-actions>
         </q-card>
       </q-dialog>
-      <router-link class="allRoutes" to="/login"> Login </router-link>
+      <router-link class="allRoutes" v-if="!isLoggedIn" to="/login"> Login </router-link>
+      <router-link class="allRoutes" v-if="isLoggedIn" to="/login" @click="logout"> Logout </router-link>
     </nav>
     <router-view />
   </header>
@@ -31,16 +32,18 @@
 
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import * as jose from "jose";
 
 const dialogShow = ref(false);
 const message = ref("");
+const isLoggedIn = ref(false);
 
 const router = useRouter();
 
 window.addEventListener("load", checkToken);
+
 function checkToken() {
   const token = localStorage.getItem("token");
 
@@ -63,10 +66,10 @@ function checkToken() {
       router.push("/login");
     } else {
       console.log("Token is still valid");
+      isLoggedIn.value = true
       router.push("/");
     }
-  }
-   catch (error) {
+  } catch (error) {
     console.log("Error decoding token: ", error.message);
     dialogShow.value = true;
     message.value = "Please Login Again";
@@ -75,6 +78,16 @@ function checkToken() {
 
   console.log(token);
 }
+
+function logout() {
+  localStorage.removeItem("token");
+  isLoggedIn.value = false; 
+  router.push("/login");
+}
+
+onMounted(() => {
+  checkToken();
+})
 </script>
 
 <style scoped>

@@ -150,7 +150,7 @@
                 </thead>
                 <tbody>
                   <tr v-for="(user, index) in users" :key="index">
-                    <td>{{ user.id }}</td>
+                    <td>{{ user.front_id }}</td>
                     <td>{{ user.name }}</td>
                     <td>{{ user.startDate }}</td>
                     <td>{{ user.endDate }}</td>
@@ -360,8 +360,9 @@ function fetchEvents() {
       },
     })
     .then((response) => {
-      users.value = response.data.map((event) => {
+      users.value = response.data.map((event, index) => {
         return {
+          front_id: index + 1,
           id: event.id,
           name: event.title_event,
           startDate: new Date(event.start_time).toLocaleString(),
@@ -403,9 +404,7 @@ function addEvent() {
 
   const startTimestamp = startTimestampnumber.toString();
   const endTimestamp = endTimestampnumber ? endTimestampnumber.toString() : "";
-  
-  // Check if description is provided, set to empty string if not
-  const description = formData.value.description ? formData.value.description.trim() : "";
+  const description = formData.value.description ? formData.value.description.trim() : ""
 
   const data = {
     EventTitle: formData.value.name,
@@ -418,8 +417,8 @@ function addEvent() {
   axios
     .post("https://event.shirpala.ir/api/event/create/", data, {
       headers: {
-        "Content-Type": "text/plain",
         Authorization: "Bearer " + token,
+        "Content-Type": "text/plain",
       },
     })
     .then(function (response) {
@@ -437,7 +436,6 @@ function addEvent() {
       loading.value = false;
     });
 }
-
 
 
 function openEditModal(index) {
@@ -603,6 +601,11 @@ td {
   padding: 8px;
   text-align: left;
   word-wrap: break-word;
+}
+
+td:first-child {
+  justify-content: center;
+  text-align: center;
 }
 
 th {
