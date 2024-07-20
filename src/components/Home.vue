@@ -401,7 +401,7 @@ function addEvent() {
     alert("Please fill in the title.");
     return;
   }
-
+  
   const startTimestamp = startTimestampnumber.toString();
   const endTimestamp = endTimestampnumber ? endTimestampnumber.toString() : "";
   const description = formData.value.description ? formData.value.description.trim() : ""
@@ -461,13 +461,6 @@ function saveEditData() {
   const startTimestamp = startTimestampnumber.toString();
   const endTimestamp = endTimestampnumber ? endTimestampnumber.toString() : "";
 
-  // const data = {
-  //   EventSummery: editFormData.value.name,
-  //   StartTime: startTimestamp,
-  //   EndTime: endTimestamp,
-  //   Description: editFormData.value.description || "",
-  //   taskId: editFormData.value.id,
-  // };
 
   const config = {
     method: "post",
@@ -489,6 +482,7 @@ function saveEditData() {
     .then((response) => {
       if (response.status === 200) {
         alert(response.data.message);
+        console.log('Editing Event Data:', editFormData.value);
         console.log("Server response:", response.data); 
         fetchEvents(); // Refresh events after editing
         isEditModalOpen.value = false; // Close modal

@@ -104,11 +104,14 @@
 import { ref, computed } from "vue";
 import axios from "axios";
 import qs from "qs";
+import { useRouter } from "vue-router";
 
 const firstName = ref("");
 const lastName = ref("");
 const password = ref("");
 const email = ref("");
+
+const router = useRouter();
 
 function postUsers() {
   const data = qs.stringify({
@@ -126,11 +129,17 @@ function postUsers() {
       },
     })
 
-    .then(function (response) {
-      console.log(response);
+    .then(() => {
+      alert('Submitted Successfully. Please Login');
+      router.push("/login");
     })
-    .catch(function (error) {
-      console.log(error.request.response);
+    .catch((error) => {
+      console.error(error);
+      if (error.response && error.response.data) {
+        alert(error.response.data);
+      } else {
+        alert('An error occurred during submission.');
+      }
     });
 }
 
