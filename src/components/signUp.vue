@@ -82,17 +82,17 @@
               ></q-btn>
             </q-card-section>
             <q-card-section class="text-center q-pt-none">
-            <div class="text-grey-8">
-              Do you have an account?
-              <router-link
-                class="text-dark text-weight-bold"
-                style="text-decoration: none"
-                to="/login"
-                >Login</router-link
-              >
-              <router-view />
-            </div>
-          </q-card-section>
+              <div class="text-grey-8">
+                Do you have an account?
+                <router-link
+                  class="text-dark text-weight-bold"
+                  style="text-decoration: none"
+                  to="/login"
+                  >Login</router-link
+                >
+                <router-view />
+              </div>
+            </q-card-section>
           </q-form>
         </q-card>
       </q-page>
@@ -116,12 +116,12 @@ const router = useRouter();
 function postUsers() {
   const data = qs.stringify({
     //data is body HTTP request
-    'first_name': firstName.value,
-    'last_name': lastName.value,
-    'password': password.value,
-    'email': email.value,
+    first_name: firstName.value,
+    last_name: lastName.value,
+    password: password.value,
+    email: email.value,
   });
-  console.log(data)
+  console.log(data);
   axios
     .post("https://event.shirpala.ir/api/auth/users/", data, {
       headers: {
@@ -129,25 +129,31 @@ function postUsers() {
       },
     })
 
-    .then(() => {
-      alert('Submitted Successfully. Please Login');
-      router.push("/login");
+    .then(function (response) {
+      if (response.status === 200) {
+        console.log(response);
+        alert("Submitted Successfully");
+        router.push("/login");
+      }
     })
-    .catch((error) => {
-      console.error(error);
-      if (error.response && error.response.data) {
-        alert(error.response.data);
-      } else {
-        alert('An error occurred during submission.');
+    .catch(function (error) {
+      if (error.response && error.response.data.password) {
+        alert(error.response.data.password);
+        console.log(error.response.data);
+        alert(error.response.data.password);
+      } else if (error.response && error.response.data.email) {
+        alert(error.response.data.email);
+        console.log(error.response.data);
+        alert(error.response.data.email);
       }
     });
 }
 
-const firstNameError = ref ("")
-const lastNameError = ref ("")
+const firstNameError = ref("");
+const lastNameError = ref("");
 const repeatPassword = ref("");
 const emailTouched = ref(false);
-const passwordError = ref("")
+const passwordError = ref("");
 const passwordMismatch = computed(
   () => password.value !== repeatPassword.value
 );
@@ -191,15 +197,15 @@ function passwordInput() {
 }
 
 const passwordPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const passwordRequirements = computed(() => passwordPattern.test(password.value));
+const passwordRequirements = computed(() =>
+  passwordPattern.test(password.value)
+);
 
 const passwordHandleBlur = () => {
   validatePassword();
   passwordInput();
   passwordRequirements;
-}
-
-
+};
 </script>
 
 <style scoped>
