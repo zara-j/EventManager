@@ -140,11 +140,9 @@ function postUsers() {
       if (error.response && error.response.data.password) {
         alert(error.response.data.password);
         console.log(error.response.data);
-        alert(error.response.data.password);
       } else if (error.response && error.response.data.email) {
         alert(error.response.data.email);
         console.log(error.response.data);
-        alert(error.response.data.email);
       }
     });
 }
