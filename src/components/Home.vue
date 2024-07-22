@@ -395,11 +395,21 @@ function addEvent() {
 
   // Validate start timestamp
   if (!startTimestampnumber) {
-    alert("Please fill in the start date.");
+   // alert("Please fill in the start date.");
+    Swal.fire({
+      icon: "error",
+      title: "Oops...",
+      text: "Please fill in the start date.",
+    });
     return;
   }
   if (!formData.value.name) {
-    alert("Please fill in the title.");
+    //alert("Please fill in the title.");
+    Swal.fire({
+      icon: "error",
+      title: "Oops...",
+      text: "Please fill in the title.",
+    });
     return;
   }
 
@@ -434,13 +444,22 @@ function addEvent() {
           icon: "success",
           title: "Your task has been successfully created",
           showConfirmButton: false,
-          timer: 1500,
+          timer: 2000,
         });
       }
     })
-    .catch(function (error) {
+    // .catch(function (error) {
+    //   console.log(error.response.data);
+    //   alert(error.response.data.message);
+    // })
+    .catch((error) => {
       console.log(error.response.data);
-      alert(error.response.data.message);
+      Swal.fire({
+        position: "center",
+        icon: "error",
+        title: "Error",
+        text: error.response.data.message,
+      });
     })
     .finally(() => {
       loading.value = false;
@@ -499,13 +518,22 @@ function saveEditData() {
           icon: "success",
           title: "Your task has been successfully edited",
           showConfirmButton: false,
-          timer: 1500,
+          timer: 2000,
         });
       }
     })
+    // .catch((error) => {
+    //   console.log(error.response.data);
+    //   alert(error.response.data.message);
+    // })
     .catch((error) => {
       console.log(error.response.data);
-      alert(error.response.data.message);
+      Swal.fire({
+        position: "center",
+        icon: "error",
+        title: "Error",
+        text: error.response.data.message,
+      });
     })
     .finally(() => {
       loading.value = false;
@@ -538,7 +566,7 @@ function deleteData(index) {
             icon: "success",
             title: "Your task has been deleted",
             showConfirmButton: false,
-            timer: 1500,
+            timer: 2000,
           });
         }
       })
