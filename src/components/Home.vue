@@ -310,6 +310,7 @@ import { ref, onMounted } from "vue";
 import axios from "axios";
 import * as jose from "jose";
 import { useRouter } from "vue-router";
+import Swal from "sweetalert2";
 
 const router = useRouter();
 const loading = ref(true); // Initially loading
@@ -401,10 +402,12 @@ function addEvent() {
     alert("Please fill in the title.");
     return;
   }
-  
+
   const startTimestamp = startTimestampnumber.toString();
   const endTimestamp = endTimestampnumber ? endTimestampnumber.toString() : "";
-  const description = formData.value.description ? formData.value.description.trim() : ""
+  const description = formData.value.description
+    ? formData.value.description.trim()
+    : "";
 
   const data = {
     EventTitle: formData.value.name,
@@ -424,8 +427,15 @@ function addEvent() {
     .then(function (response) {
       if (response.status === 200) {
         console.log(response);
-        alert(response.data.message);
+        //alert(response.data.message);
         fetchEvents(); // Refresh events after adding
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Your task has been successfully created",
+          showConfirmButton: false,
+          timer: 1500,
+        });
       }
     })
     .catch(function (error) {
@@ -436,7 +446,6 @@ function addEvent() {
       loading.value = false;
     });
 }
-
 
 function openEditModal(index) {
   if (index >= 0 && index < users.value.length) {
@@ -461,7 +470,6 @@ function saveEditData() {
   const startTimestamp = startTimestampnumber.toString();
   const endTimestamp = endTimestampnumber ? endTimestampnumber.toString() : "";
 
-
   const config = {
     method: "post",
     maxBodyLength: Infinity,
@@ -482,10 +490,17 @@ function saveEditData() {
     .then((response) => {
       if (response.status === 200) {
         alert(response.data.message);
-        console.log('Editing Event Data:', editFormData.value);
-        console.log("Server response:", response.data); 
+        console.log("Editing Event Data:", editFormData.value);
+        console.log("Server response:", response.data);
         fetchEvents(); // Refresh events after editing
         isEditModalOpen.value = false; // Close modal
+        Swal.fire({
+          position: "center",
+          icon: "success",
+          title: "Your task has been successfully edited",
+          showConfirmButton: false,
+          timer: 1500,
+        });
       }
     })
     .catch((error) => {
@@ -517,7 +532,14 @@ function deleteData(index) {
       .then((response) => {
         if (response.status === 200) {
           users.value.splice(index, 1);
-          alert("Event deleted successfully.");
+          // alert("Event deleted successfully.");
+          Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Your task has been deleted",
+            showConfirmButton: false,
+            timer: 1500,
+          });
         }
       })
       .catch((error) => {

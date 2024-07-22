@@ -105,6 +105,7 @@ import { ref, computed } from "vue";
 import axios from "axios";
 import qs from "qs";
 import { useRouter } from "vue-router";
+import Swal from 'sweetalert2'
 
 const firstName = ref("");
 const lastName = ref("");
