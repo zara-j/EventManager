@@ -444,7 +444,7 @@ function addEvent() {
           icon: "success",
           title: "Your task has been successfully created",
           showConfirmButton: false,
-          timer: 2000,
+          timer: 2500,
         });
       }
     })
@@ -460,6 +460,7 @@ function addEvent() {
         title: "Error",
         text: error.response.data.message,
       });
+      
     })
     .finally(() => {
       loading.value = false;
@@ -518,7 +519,7 @@ function saveEditData() {
           icon: "success",
           title: "Your task has been successfully edited",
           showConfirmButton: false,
-          timer: 2000,
+          timer: 2500,
         });
       }
     })
@@ -563,10 +564,10 @@ function deleteData(index) {
           // alert("Event deleted successfully.");
           Swal.fire({
             position: "center",
-            icon: "success",
+            icon: "error",
             title: "Your task has been deleted",
             showConfirmButton: false,
-            timer: 2000,
+            timer: 2500,
           });
         }
       })

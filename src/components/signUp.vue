@@ -133,7 +133,14 @@ function postUsers() {
     .then(function (response) {
       if (response.status === 200) {
         console.log(response);
-        alert("Submitted Successfully");
+        //alert("Submitted Successfully");
+        Swal.fire({
+            position: "center",
+            icon: "success",
+            title: "Submitted Successfully",
+            showConfirmButton: false,
+            timer: 2000,
+          });
         router.push("/login");
       }
     })

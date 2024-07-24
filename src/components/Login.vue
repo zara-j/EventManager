@@ -67,6 +67,7 @@ import axios from "axios";
 import qs from "qs";
 import { useRouter } from "vue-router";
 import * as jose from 'jose'
+import Swal from 'sweetalert2'
 
 
 const email = ref("");
@@ -113,13 +114,34 @@ function loginUsers() {
     })
     .catch(function (error) {
       if (error.response && error.response.data.password) {
-        alert(error.response.data.password);
+        //alert(error.response.data.password);
+        Swal.fire({
+            position: "center",
+            icon: "error",
+            title: error.response.data.password,
+            showConfirmButton: false,
+            timer: 2500,
+          });
         console.log(error.response.data);
       } else if (error.response && error.response.data.email) {
-        alert(error.response.data.email);
+        //alert(error.response.data.email);
+        Swal.fire({
+            position: "center",
+            icon: "error",
+            title: error.response.data.email,
+            showConfirmButton: false,
+            timer: 2500,
+          });
         console.log(error.response.data);
       } else if (error.response && error.response.data.detail) {
-        alert(error.response.data.detail);
+        //alert(error.response.data.detail);
+        Swal.fire({
+            position: "center",
+            icon: "error",
+            title: error.response.data.detail,
+            showConfirmButton: false,
+            timer: 2500,
+          });
         console.log(error.response.data);
       }
     });

@@ -49,8 +49,8 @@ function checkToken() {
 
   if (!token) {
     console.log("No token found");
-    dialogShow.value = true;
-    message.value = "Please Login First";
+    // dialogShow.value = true;
+    // message.value = "Please Login First";
     router.push("/login");
     return;
   }
@@ -61,8 +61,8 @@ function checkToken() {
 
     if (decodedToken.exp * 1000 < new Date().getTime()) {
       console.log("Token has expired");
-      dialogShow.value = true;
-      message.value = "Please Login First";
+      // dialogShow.value = true;
+      // message.value = "Please Login First";
       router.push("/login");
     } else {
       console.log("Token is still valid");
