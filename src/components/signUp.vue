@@ -143,7 +143,7 @@ function postUsers() {
           setTimeout(() => {
             console.log("Alert closed, redirecting to login...");
             router.push("/login");
-          }, 2000); // Delay matches the Swal timer
+          }, 2500); // Delay matches the Swal timer
         });
       }
     })
