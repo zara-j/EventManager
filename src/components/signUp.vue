@@ -105,7 +105,7 @@ import { ref, computed } from "vue";
 import axios from "axios";
 import qs from "qs";
 import { useRouter } from "vue-router";
-import Swal from 'sweetalert2'
+import Swal from "sweetalert2";
 
 const firstName = ref("");
 const lastName = ref("");
@@ -131,25 +131,43 @@ function postUsers() {
     })
 
     .then(function (response) {
-      if (response.status === 200) {
-        console.log(response);
-        //alert("Submitted Successfully");
+      if (response.status === 200 || response.status === 201) {
+        console.log("Response received:", response);
         Swal.fire({
-            position: "center",
-            icon: "success",
-            title: "Submitted Successfully",
-            showConfirmButton: false,
-            timer: 2000,
-          });
-        router.push("/login");
+          position: "center",
+          icon: "success",
+          title: "Submitted Successfully",
+          showConfirmButton: false,
+          timer: 2000,
+        }).then(() => {
+          setTimeout(() => {
+            console.log("Alert closed, redirecting to login...");
+            router.push("/login");
+          }, 2000); // Delay matches the Swal timer
+        });
       }
     })
+
     .catch(function (error) {
       if (error.response && error.response.data.password) {
-        alert(error.response.data.password);
+        // alert(error.response.data.password);
+        Swal.fire({
+          position: "center",
+          icon: "error",
+          title: error.response.data.password,
+          showConfirmButton: false,
+          timer: 2500,
+        });
         console.log(error.response.data);
       } else if (error.response && error.response.data.email) {
-        alert(error.response.data.email);
+        //alert(error.response.data.email);
+        Swal.fire({
+          position: "center",
+          icon: "error",
+          title: error.response.data.email,
+          showConfirmButton: false,
+          timer: 2500,
+        });
         console.log(error.response.data);
       }
     });
