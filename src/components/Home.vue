@@ -543,42 +543,65 @@ function saveEditData() {
 
 function deleteData(index) {
   if (index >= 0 && index < users.value.length) {
-    const token = localStorage.getItem("token");
-    const userId = users.value[index].id;
+    const user = users.value[index];
 
-    const config = {
-      method: "post",
-      maxBodyLength: Infinity,
-      url: "https://event.shirpala.ir/api/event/delete/",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        taskId: userId,
-      },
-    };
+    Swal.fire({
+      title: "Are you sure?",
+      text: "Do you really want to delete this event?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "No, keep it",
+      confirmButtonClass: "btn btn-success",
+      cancelButtonClass: "btn btn-danger",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const token = localStorage.getItem("token");
+        const userId = user.id;
 
-    axios
-      .request(config)
-      .then((response) => {
-        if (response.status === 200) {
-          users.value.splice(index, 1);
-          // alert("Event deleted successfully.");
-          Swal.fire({
-            position: "center",
-            icon: "error",
-            title: "Your task has been deleted",
-            showConfirmButton: false,
-            timer: 2500,
+        const config = {
+          method: "post",
+          maxBodyLength: Infinity,
+          url: "https://event.shirpala.ir/api/event/delete/",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            taskId: userId,
+          },
+        };
+
+        axios
+          .request(config)
+          .then((response) => {
+            if (response.status === 200) {
+              users.value.splice(index, 1);
+              Swal.fire({
+                position: "center",
+                icon: "success",
+                title: "Event deleted successfully.",
+                showConfirmButton: false,
+                timer: 2500,
+              });
+            }
+          })
+          .catch((error) => {
+            console.log(error);
+            Swal.fire({
+              icon: "error",
+              title: "Failed to delete the event.",
+              text: "There was an error deleting the event.",
+            });
           });
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-        alert("Failed to delete the event.");
-      });
+      }
+    });
   } else {
-    alert("User not found.");
+    //alert("User not found.");
+    Swal.fire({
+              icon: "error",
+              text: "User not found",
+            });
   }
 }
+
 
 function clearInputs() {
   formData.value.name = "";
