@@ -552,8 +552,8 @@ function deleteData(index) {
       showCancelButton: true,
       confirmButtonText: "Yes, delete it!",
       cancelButtonText: "No, keep it",
-      confirmButtonClass: "btn btn-success",
-      cancelButtonClass: "btn btn-danger",
+      // confirmButtonClass: "btn btn-success",
+      // cancelButtonClass: "btn btn-danger",
     }).then((result) => {
       if (result.isConfirmed) {
         const token = localStorage.getItem("token");
