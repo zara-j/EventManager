@@ -16,8 +16,8 @@ export default defineConfig({
     }),
     VitePWA({
       manifest: {
-        name: 'My App',
-        short_name: 'App',
+        name: 'Event Manager',
+        short_name: 'Event Manager',
         description: 'My Progressive Web App',
         start_url: '/',
         display: 'standalone',
